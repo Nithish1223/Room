@@ -69,7 +69,7 @@
         
         .nav-tab {
             flex: 1;
-            min-width: 150px;
+            min-width: 120px;
             padding: 20px;
             text-align: center;
             background: none;
@@ -485,57 +485,6 @@
             transform: translateY(-2px);
         }
         
-        @media (max-width: 768px) {
-            .container {
-                margin: 10px;
-                border-radius: 15px;
-            }
-            
-            .header {
-                padding: 30px 20px;
-            }
-            
-            .header h1 {
-                font-size: 2.5em;
-            }
-            
-            .tab-content {
-                padding: 20px;
-            }
-            
-            .section {
-                padding: 20px;
-            }
-            
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-tabs {
-                flex-direction: column;
-            }
-            
-            .nav-tab {
-                min-width: auto;
-            }
-            
-            table {
-                font-size: 14px;
-            }
-            
-            th, td {
-                padding: 12px 8px;
-            }
-            
-            .date-filter {
-                flex-direction: column;
-            }
-            
-            .month-selector {
-                justify-content: center;
-            }
-        }
-        
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -628,6 +577,120 @@
         .remove-item:hover {
             background: #c82333;
         }
+        
+        .settlement-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+        
+        .settlement-item:hover {
+            border-color: #4facfe;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.1);
+        }
+        
+        .settlement-item.paid {
+            background: #f8f9fa;
+            border-color: #28a745;
+            opacity: 0.8;
+        }
+        
+        .settlement-details {
+            flex: 1;
+        }
+        
+        .settlement-amount {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #4facfe;
+            margin-bottom: 5px;
+        }
+        
+        .settlement-parties {
+            color: #666;
+            font-size: 0.95em;
+        }
+        
+        .settlement-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .settlement-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2.5em;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .nav-tab {
+                min-width: auto;
+            }
+            
+            table {
+                font-size: 14px;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+            }
+            
+            .date-filter {
+                flex-direction: column;
+            }
+            
+            .month-selector {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -642,6 +705,7 @@
             <button class="nav-tab" onclick="switchTab('members')">👥 Members</button>
             <button class="nav-tab" onclick="switchTab('expenses')">💰 Add Expense</button>
             <button class="nav-tab" onclick="switchTab('calculator')">🧮 Calculator</button>
+            <button class="nav-tab" onclick="switchTab('settlements')">💳 Settlements</button>
             <button class="nav-tab" onclick="switchTab('history')">📋 History</button>
             <button class="nav-tab" onclick="switchTab('analytics')">📈 Analytics</button>
         </div>
@@ -723,6 +787,38 @@
             </div>
         </div>
         
+        <!-- Add Expense Tab -->
+        <div id="expenses" class="tab-content">
+            <div class="section">
+                <h2>💰 Add New Expense</h2>
+                <div class="form-grid">
+                    <div>
+                        <div class="form-group">
+                            <label for="expenseAmount">Amount (₹):</label>
+                            <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseDescription">Description:</label>
+                            <input type="text" id="expenseDescription" placeholder="What was purchased?">
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label for="expenseDate">Date:</label>
+                            <input type="date" id="expenseDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="expensePaidBy">Paid By:</label>
+                            <select id="expensePaidBy">
+                                <option value="">Select who paid</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="addExpense()" id="addExpenseBtn" class="btn-secondary">Add Expense</button>
+            </div>
+        </div>
+        
         <!-- Calculator Tab -->
         <div id="calculator" class="tab-content">
             <div class="section">
@@ -785,35 +881,25 @@
             </div>
         </div>
         
-        <!-- Add Expense Tab -->
-        <div id="expenses" class="tab-content">
+        <!-- Settlements Tab -->
+        <div id="settlements" class="tab-content">
             <div class="section">
-                <h2>💰 Add New Expense</h2>
-                <div class="form-grid">
-                    <div>
-                        <div class="form-group">
-                            <label for="expenseAmount">Amount (₹):</label>
-                            <input type="number" id="expenseAmount" placeholder="0.00" step="0.01" min="0">
-                        </div>
-                        <div class="form-group">
-                            <label for="expenseDescription">Description:</label>
-                            <input type="text" id="expenseDescription" placeholder="What was purchased?">
-                        </div>
-                    </div>
-                    <div>
-                        <div class="form-group">
-                            <label for="expenseDate">Date:</label>
-                            <input type="date" id="expenseDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="expensePaidBy">Paid By:</label>
-                            <select id="expensePaidBy">
-                                <option value="">Select who paid</option>
-                            </select>
-                        </div>
+                <h2>💳 Settlement Tracking</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                    <p style="color: #666;">Track who has paid their share and manage settlements</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="recalculateSettlements()" class="btn-secondary" style="width: auto; padding: 12px 20px;">
+                            🔄 Recalculate
+                        </button>
+                        <button onclick="markAllPaid()" class="btn-success" style="width: auto; padding: 12px 20px;">
+                            ✅ Mark All as Paid
+                        </button>
                     </div>
                 </div>
-                <button onclick="addExpense()" id="addExpenseBtn" class="btn-secondary">Add Expense</button>
+                
+                <div id="settlementsList">
+                    <div class="loading">Loading settlements...</div>
+                </div>
             </div>
         </div>
         
@@ -823,10 +909,6 @@
                 <h2>📋 Expense History</h2>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
                     <div style="display: flex; gap: 15px; flex-wrap: wrap; flex: 1;">
-                        <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
-                            <label for="startDate">From Date:</label>
-                            <input type="date" id="startDate">
-                        </div>
                         <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
                             <label for="endDate">To Date:</label>
                             <input type="date" id="endDate">
@@ -941,6 +1023,7 @@
         let selectedMonth = new Date().getMonth();
         let selectedYear = new Date().getFullYear();
         let calculatorItems = [];
+        let settlements = [];
 
         // Make functions available globally
         window.switchTab = switchTab;
@@ -955,6 +1038,9 @@
         window.clearCalculator = clearCalculator;
         window.saveCalculatorExpense = saveCalculatorExpense;
         window.downloadExpensesCSV = downloadExpensesCSV;
+        window.markSettlementPaid = markSettlementPaid;
+        window.markAllPaid = markAllPaid;
+        window.recalculateSettlements = recalculateSettlements;
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
@@ -966,6 +1052,7 @@
             generateMonthSelector();
             loadMembers();
             loadExpenses();
+            loadSettlements();
         });
 
         /**
@@ -987,6 +1074,8 @@
                 updateAnalytics();
             } else if (tabName === 'dashboard') {
                 updateDashboard();
+            } else if (tabName === 'settlements') {
+                loadSettlements();
             }
         }
 
@@ -1001,6 +1090,25 @@
             setTimeout(() => {
                 errorContainer.style.display = 'none';
             }, 5000);
+        }
+
+        /**
+         * Show success message helper
+         */
+        function showSuccessMessage(message) {
+            const errorContainer = document.getElementById('errorContainer');
+            errorContainer.style.background = '#d4edda';
+            errorContainer.style.color = '#155724';
+            errorContainer.style.borderColor = '#c3e6cb';
+            errorContainer.textContent = message;
+            errorContainer.style.display = 'block';
+            
+            setTimeout(() => {
+                errorContainer.style.display = 'none';
+                errorContainer.style.background = '#f8d7da';
+                errorContainer.style.color = '#721c24';
+                errorContainer.style.borderColor = '#f5c6cb';
+            }, 3000);
         }
 
         /**
@@ -1048,6 +1156,7 @@
                 memberPhotoInput.value = '';
                 
                 await loadMembers();
+                recalculateSettlements(); // Recalculate when members change
             } catch (error) {
                 console.error('Error adding member:', error);
                 showError('Failed to add member. Please try again.');
@@ -1079,6 +1188,7 @@
                 
                 await loadMembers();
                 await loadExpenses();
+                recalculateSettlements(); // Recalculate when members change
             } catch (error) {
                 console.error('Error removing member:', error);
                 showError('Failed to remove member. Please try again.');
@@ -1183,37 +1293,8 @@
         }
 
         /**
-         * Delete an expense
+         * Add a new expense
          */
-        async function deleteExpense(expenseId, description) {
-            if (!confirm(`Are you sure you want to delete the expense: "${description}"?`)) {
-                return;
-            }
-            
-            try {
-                await deleteDoc(doc(db, 'expenses', expenseId));
-                await loadExpenses();
-                
-                // Show success message briefly
-                const originalError = document.getElementById('errorContainer');
-                originalError.style.background = '#d4edda';
-                originalError.style.color = '#155724';
-                originalError.style.borderColor = '#c3e6cb';
-                originalError.textContent = 'Expense deleted successfully!';
-                originalError.style.display = 'block';
-                
-                setTimeout(() => {
-                    originalError.style.display = 'none';
-                    originalError.style.background = '#f8d7da';
-                    originalError.style.color = '#721c24';
-                    originalError.style.borderColor = '#f5c6cb';
-                }, 3000);
-                
-            } catch (error) {
-                console.error('Error deleting expense:', error);
-                showError('Failed to delete expense. Please try again.');
-            }
-        }
         async function addExpense() {
             const amount = parseFloat(document.getElementById('expenseAmount').value);
             const description = document.getElementById('expenseDescription').value.trim();
@@ -1260,6 +1341,7 @@
                 document.getElementById('expensePaidBy').value = '';
                 
                 await loadExpenses();
+                recalculateSettlements(); // Recalculate when expenses change
                 
                 // Switch to dashboard to show updated stats
                 switchTab('dashboard');
@@ -1273,231 +1355,23 @@
         }
 
         /**
-         * Add item to calculator
+         * Delete an expense
          */
-        function addItemToCalculator() {
-            const itemDescription = document.getElementById('itemDescription').value.trim();
-            const itemAmount = parseFloat(document.getElementById('itemAmount').value);
-            
-            if (!itemDescription) {
-                showError('Please enter item description');
+        async function deleteExpense(expenseId, description) {
+            if (!confirm(`Are you sure you want to delete the expense: "${description}"?`)) {
                 return;
             }
-            
-            if (!itemAmount || itemAmount <= 0) {
-                showError('Please enter a valid amount');
-                return;
-            }
-            
-            const item = {
-                id: Date.now(),
-                description: itemDescription,
-                amount: itemAmount
-            };
-            
-            calculatorItems.push(item);
-            
-            // Clear inputs
-            document.getElementById('itemDescription').value = '';
-            document.getElementById('itemAmount').value = '';
-            
-            updateCalculatorDisplay();
-        }
-
-        /**
-         * Remove item from calculator
-         */
-        function removeItemFromCalculator(itemId) {
-            calculatorItems = calculatorItems.filter(item => item.id !== itemId);
-            updateCalculatorDisplay();
-        }
-
-        /**
-         * Clear all calculator items
-         */
-        function clearCalculator() {
-            if (calculatorItems.length === 0) return;
-            
-            if (confirm('Are you sure you want to clear all items?')) {
-                calculatorItems = [];
-                updateCalculatorDisplay();
-            }
-        }
-
-        /**
-         * Update calculator display
-         */
-        function updateCalculatorDisplay() {
-            const calculatorItemsDiv = document.getElementById('calculatorItems');
-            const calculatorTotal = document.getElementById('calculatorTotal');
-            
-            if (calculatorItems.length === 0) {
-                calculatorItemsDiv.innerHTML = `
-                    <div class="empty-state">
-                        <div style="font-size: 3em;">🛒</div>
-                        <p>No items added yet. Start adding items to calculate total.</p>
-                    </div>
-                `;
-                calculatorTotal.textContent = '0.00';
-                return;
-            }
-            
-            const total = calculatorItems.reduce((sum, item) => sum + item.amount, 0);
-            calculatorTotal.textContent = total.toFixed(2);
-            
-            calculatorItemsDiv.innerHTML = calculatorItems.map(item => `
-                <div class="calculator-item">
-                    <div class="item-details">
-                        <div class="item-name">${item.description}</div>
-                    </div>
-                    <div class="item-amount">₹${item.amount.toFixed(2)}</div>
-                    <button class="remove-item" onclick="removeItemFromCalculator(${item.id})">×</button>
-                </div>
-            `).join('');
-        }
-
-        /**
-         * Save calculator items as single expense
-         */
-        async function saveCalculatorExpense() {
-            if (calculatorItems.length === 0) {
-                showError('Please add some items first');
-                return;
-            }
-            
-            const date = document.getElementById('calcDate').value;
-            const paidBy = document.getElementById('calcPaidBy').value;
-            
-            if (!date) {
-                showError('Please select a date');
-                return;
-            }
-            
-            if (!paidBy) {
-                showError('Please select who paid');
-                return;
-            }
-            
-            const total = calculatorItems.reduce((sum, item) => sum + item.amount, 0);
-            const description = `Multiple items: ${calculatorItems.map(item => item.description).join(', ')}`;
-            
-            const saveBtn = document.getElementById('saveCalculatorBtn');
-            saveBtn.disabled = true;
-            saveBtn.textContent = 'Saving...';
             
             try {
-                await addDoc(collection(db, 'expenses'), {
-                    amount: total,
-                    description: description,
-                    date: date,
-                    paidBy: paidBy,
-                    items: calculatorItems, // Store individual items for reference
-                    createdAt: new Date()
-                });
-                
-                // Clear calculator
-                calculatorItems = [];
-                document.getElementById('calcDate').valueAsDate = new Date();
-                document.getElementById('calcPaidBy').value = '';
-                updateCalculatorDisplay();
-                
+                await deleteDoc(doc(db, 'expenses', expenseId));
                 await loadExpenses();
+                recalculateSettlements(); // Recalculate when expenses change
                 
-                // Show success and switch to dashboard
-                const originalError = document.getElementById('errorContainer');
-                originalError.style.background = '#d4edda';
-                originalError.style.color = '#155724';
-                originalError.style.borderColor = '#c3e6cb';
-                originalError.textContent = 'Calculator expense saved successfully!';
-                originalError.style.display = 'block';
-                
-                setTimeout(() => {
-                    originalError.style.display = 'none';
-                    originalError.style.background = '#f8d7da';
-                    originalError.style.color = '#721c24';
-                    originalError.style.borderColor = '#f5c6cb';
-                }, 3000);
-                
-                switchTab('dashboard');
+                showSuccessMessage('Expense deleted successfully!');
             } catch (error) {
-                console.error('Error saving calculator expense:', error);
-                showError('Failed to save expense. Please try again.');
+                console.error('Error deleting expense:', error);
+                showError('Failed to delete expense. Please try again.');
             }
-            
-            saveBtn.disabled = false;
-            saveBtn.textContent = '💾 Save as Single Expense';
-        }
-
-        /**
-         * Download expenses as CSV
-         */
-        function downloadExpensesCSV() {
-            if (filteredExpenses.length === 0) {
-                showError('No expenses to download. Please add some expenses first.');
-                return;
-            }
-            
-            // Prepare CSV data
-            const csvData = [
-                ['Date', 'Description', 'Amount (₹)', 'Paid By', 'Created At']
-            ];
-            
-            filteredExpenses.forEach(expense => {
-                csvData.push([
-                    expense.date,
-                    expense.description.replace(/,/g, ';'), // Replace commas to avoid CSV issues
-                    expense.amount.toFixed(2),
-                    expense.paidBy,
-                    new Date(expense.createdAt.seconds * 1000).toLocaleDateString('en-IN')
-                ]);
-            });
-            
-            // Add summary data
-            csvData.push([]); // Empty row
-            csvData.push(['SUMMARY']);
-            csvData.push(['Total Expenses', filteredExpenses.length]);
-            csvData.push(['Total Amount', `₹${filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0).toFixed(2)}`]);
-            
-            // Add member-wise breakdown
-            csvData.push([]);
-            csvData.push(['MEMBER-WISE BREAKDOWN']);
-            const memberStats = {};
-            filteredExpenses.forEach(expense => {
-                memberStats[expense.paidBy] = (memberStats[expense.paidBy] || 0) + expense.amount;
-            });
-            
-            Object.entries(memberStats).forEach(([member, amount]) => {
-                csvData.push([member, `₹${amount.toFixed(2)}`]);
-            });
-            
-            // Convert to CSV string
-            const csvContent = csvData.map(row => row.join(',')).join('\n');
-            
-            // Create and download file
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            link.setAttribute('href', url);
-            link.setAttribute('download', `expenses_${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Show success message
-            const originalError = document.getElementById('errorContainer');
-            originalError.style.background = '#d4edda';
-            originalError.style.color = '#155724';
-            originalError.style.borderColor = '#c3e6cb';
-            originalError.textContent = 'CSV file downloaded successfully!';
-            originalError.style.display = 'block';
-            
-            setTimeout(() => {
-                originalError.style.display = 'none';
-                originalError.style.background = '#f8d7da';
-                originalError.style.color = '#721c24';
-                originalError.style.borderColor = '#f5c6cb';
-            }, 3000);
         }
 
         /**
@@ -1580,7 +1454,351 @@
         }
 
         /**
-         * Generate month selector for analytics
+         * Calculator functions
+         */
+        function addItemToCalculator() {
+            const itemDescription = document.getElementById('itemDescription').value.trim();
+            const itemAmount = parseFloat(document.getElementById('itemAmount').value);
+            
+            if (!itemDescription) {
+                showError('Please enter item description');
+                return;
+            }
+            
+            if (!itemAmount || itemAmount <= 0) {
+                showError('Please enter a valid amount');
+                return;
+            }
+            
+            const item = {
+                id: Date.now(),
+                description: itemDescription,
+                amount: itemAmount
+            };
+            
+            calculatorItems.push(item);
+            
+            // Clear inputs
+            document.getElementById('itemDescription').value = '';
+            document.getElementById('itemAmount').value = '';
+            
+            updateCalculatorDisplay();
+        }
+
+        function removeItemFromCalculator(itemId) {
+            calculatorItems = calculatorItems.filter(item => item.id !== itemId);
+            updateCalculatorDisplay();
+        }
+
+        function clearCalculator() {
+            if (calculatorItems.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear all items?')) {
+                calculatorItems = [];
+                updateCalculatorDisplay();
+            }
+        }
+
+        function updateCalculatorDisplay() {
+            const calculatorItemsDiv = document.getElementById('calculatorItems');
+            const calculatorTotal = document.getElementById('calculatorTotal');
+            
+            if (calculatorItems.length === 0) {
+                calculatorItemsDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 3em;">🛒</div>
+                        <p>No items added yet. Start adding items to calculate total.</p>
+                    </div>
+                `;
+                calculatorTotal.textContent = '0.00';
+                return;
+            }
+            
+            const total = calculatorItems.reduce((sum, item) => sum + item.amount, 0);
+            calculatorTotal.textContent = total.toFixed(2);
+            
+            calculatorItemsDiv.innerHTML = calculatorItems.map(item => `
+                <div class="calculator-item">
+                    <div class="item-details">
+                        <div class="item-name">${item.description}</div>
+                    </div>
+                    <div class="item-amount">₹${item.amount.toFixed(2)}</div>
+                    <button class="remove-item" onclick="removeItemFromCalculator(${item.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        async function saveCalculatorExpense() {
+            if (calculatorItems.length === 0) {
+                showError('Please add some items first');
+                return;
+            }
+            
+            const date = document.getElementById('calcDate').value;
+            const paidBy = document.getElementById('calcPaidBy').value;
+            
+            if (!date) {
+                showError('Please select a date');
+                return;
+            }
+            
+            if (!paidBy) {
+                showError('Please select who paid');
+                return;
+            }
+            
+            const total = calculatorItems.reduce((sum, item) => sum + item.amount, 0);
+            const description = `Multiple items: ${calculatorItems.map(item => item.description).join(', ')}`;
+            
+            const saveBtn = document.getElementById('saveCalculatorBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            
+            try {
+                await addDoc(collection(db, 'expenses'), {
+                    amount: total,
+                    description: description,
+                    date: date,
+                    paidBy: paidBy,
+                    items: calculatorItems,
+                    createdAt: new Date()
+                });
+                
+                // Clear calculator
+                calculatorItems = [];
+                document.getElementById('calcDate').valueAsDate = new Date();
+                document.getElementById('calcPaidBy').value = '';
+                updateCalculatorDisplay();
+                
+                await loadExpenses();
+                recalculateSettlements();
+                
+                showSuccessMessage('Calculator expense saved successfully!');
+                switchTab('dashboard');
+            } catch (error) {
+                console.error('Error saving calculator expense:', error);
+                showError('Failed to save expense. Please try again.');
+            }
+            
+            saveBtn.disabled = false;
+            saveBtn.textContent = '💾 Save as Single Expense';
+        }
+
+        /**
+         * Settlement Management Functions
+         */
+        function loadSettlements() {
+            const storedSettlements = localStorage.getItem('settlements');
+            settlements = storedSettlements ? JSON.parse(storedSettlements) : [];
+            
+            // If no stored settlements, calculate from current balances
+            if (settlements.length === 0 && expenses.length > 0) {
+                calculateCurrentSettlements();
+            }
+            
+            updateSettlementsList();
+        }
+
+        function calculateCurrentSettlements() {
+            if (members.length === 0 || expenses.length === 0) {
+                settlements = [];
+                localStorage.setItem('settlements', JSON.stringify(settlements));
+                return;
+            }
+            
+            const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const perPersonShare = totalAmount / members.length;
+            const balances = {};
+            
+            // Calculate balances
+            members.forEach(member => {
+                balances[member.name] = -perPersonShare;
+            });
+            
+            expenses.forEach(expense => {
+                if (balances.hasOwnProperty(expense.paidBy)) {
+                    balances[expense.paidBy] += expense.amount;
+                }
+            });
+            
+            // Calculate settlements
+            const currentSettlements = calculateSettlements(balances);
+            
+            // Store settlements with payment status (preserve existing payment status)
+            const existingSettlements = settlements.reduce((acc, s) => {
+                acc[`${s.from}-${s.to}`] = s;
+                return acc;
+            }, {});
+            
+            settlements = currentSettlements.map((settlement, index) => {
+                const key = `${settlement.from}-${settlement.to}`;
+                const existing = existingSettlements[key];
+                
+                return {
+                    id: existing ? existing.id : Date.now() + index,
+                    from: settlement.from,
+                    to: settlement.to,
+                    amount: settlement.amount,
+                    paid: existing ? existing.paid : false,
+                    paidDate: existing ? existing.paidDate : null
+                };
+            });
+            
+            localStorage.setItem('settlements', JSON.stringify(settlements));
+        }
+
+        function recalculateSettlements() {
+            calculateCurrentSettlements();
+            updateSettlementsList();
+            updateDashboard(); // Refresh dashboard settlements
+        }
+
+        function updateSettlementsList() {
+            const settlementsListDiv = document.getElementById('settlementsList');
+            
+            if (!settlementsListDiv) return; // Tab not loaded yet
+            
+            if (settlements.length === 0) {
+                settlementsListDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 3em;">✅</div>
+                        <p>All settled! No outstanding payments.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            settlementsListDiv.innerHTML = settlements.map(settlement => `
+                <div class="settlement-item ${settlement.paid ? 'paid' : ''}">
+                    <div class="settlement-details">
+                        <div class="settlement-amount">₹${settlement.amount.toFixed(2)}</div>
+                        <div class="settlement-parties">${settlement.from} → ${settlement.to}</div>
+                        ${settlement.paid ? `<div style="font-size: 0.8em; color: #28a745;">✅ Paid on ${new Date(settlement.paidDate).toLocaleDateString()}</div>` : ''}
+                    </div>
+                    <div class="settlement-actions">
+                        <span class="settlement-status status-${settlement.paid ? 'paid' : 'pending'}">
+                            ${settlement.paid ? 'Paid' : 'Pending'}
+                        </span>
+                        ${!settlement.paid ? `
+                            <button class="btn-small btn-success" onclick="markSettlementPaid(${settlement.id})" style="width: auto; padding: 6px 12px;">
+                                ✅ Mark Paid
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function markSettlementPaid(settlementId) {
+            const settlement = settlements.find(s => s.id === settlementId);
+            if (!settlement || settlement.paid) return;
+            
+            if (!confirm(`Mark payment from ${settlement.from} to ${settlement.to} as completed?`)) {
+                return;
+            }
+            
+            settlement.paid = true;
+            settlement.paidDate = new Date().toISOString();
+            
+            localStorage.setItem('settlements', JSON.stringify(settlements));
+            updateSettlementsList();
+            updateDashboard(); // Refresh dashboard to show updated settlements
+            
+            showSuccessMessage(`Payment marked as completed! ✅`);
+        }
+
+        function markAllPaid() {
+            const unpaidSettlements = settlements.filter(s => !s.paid);
+            
+            if (unpaidSettlements.length === 0) {
+                showError('No pending settlements to mark as paid.');
+                return;
+            }
+            
+            if (!confirm(`Mark all ${unpaidSettlements.length} settlements as paid?`)) {
+                return;
+            }
+            
+            settlements.forEach(settlement => {
+                if (!settlement.paid) {
+                    settlement.paid = true;
+                    settlement.paidDate = new Date().toISOString();
+                }
+            });
+            
+            localStorage.setItem('settlements', JSON.stringify(settlements));
+            updateSettlementsList();
+            updateDashboard();
+            
+            showSuccessMessage(`All settlements marked as paid! 🎉`);
+        }
+
+        /**
+         * Download expenses as CSV
+         */
+        function downloadExpensesCSV() {
+            if (filteredExpenses.length === 0) {
+                showError('No expenses to download. Please add some expenses first.');
+                return;
+            }
+            
+            const csvData = [
+                ['Date', 'Description', 'Amount (₹)', 'Paid By', 'Created At']
+            ];
+            
+            filteredExpenses.forEach(expense => {
+                const createdDate = expense.createdAt ? 
+                    (expense.createdAt.seconds ? 
+                        new Date(expense.createdAt.seconds * 1000).toLocaleDateString('en-IN') : 
+                        new Date(expense.createdAt).toLocaleDateString('en-IN')
+                    ) : 'Unknown';
+                
+                csvData.push([
+                    expense.date,
+                    expense.description.replace(/,/g, ';'),
+                    expense.amount.toFixed(2),
+                    expense.paidBy,
+                    createdDate
+                ]);
+            });
+            
+            // Add summary data
+            csvData.push([]);
+            csvData.push(['SUMMARY']);
+            csvData.push(['Total Expenses', filteredExpenses.length]);
+            csvData.push(['Total Amount', `₹${filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0).toFixed(2)}`]);
+            
+            // Add member-wise breakdown
+            csvData.push([]);
+            csvData.push(['MEMBER-WISE BREAKDOWN']);
+            const memberStats = {};
+            filteredExpenses.forEach(expense => {
+                memberStats[expense.paidBy] = (memberStats[expense.paidBy] || 0) + expense.amount;
+            });
+            
+            Object.entries(memberStats).forEach(([member, amount]) => {
+                csvData.push([member, `₹${amount.toFixed(2)}`]);
+            });
+            
+            // Convert to CSV string
+            const csvContent = csvData.map(row => row.join(',')).join('\n');
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `expenses_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showSuccessMessage('CSV file downloaded successfully!');
+        }
+
+        /**
+         * Analytics and Dashboard Functions
          */
         function generateMonthSelector() {
             const monthSelector = document.getElementById('monthSelector');
@@ -1600,9 +1818,6 @@
             `).join('');
         }
 
-        /**
-         * Select a month for analytics
-         */
         function selectMonth(monthIndex) {
             selectedMonth = monthIndex;
             
@@ -1612,9 +1827,6 @@
             updateAnalytics();
         }
 
-        /**
-         * Update dashboard statistics
-         */
         function updateDashboard() {
             const totalExpenses = expenses.length;
             const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -1644,9 +1856,6 @@
             updateRecentExpenses();
         }
 
-        /**
-         * Update recent expenses on dashboard
-         */
         function updateRecentExpenses() {
             const recentExpensesDiv = document.getElementById('recentExpenses');
             const recentExpenses = expenses.slice(0, 5);
@@ -1688,9 +1897,6 @@
             `;
         }
 
-        /**
-         * Update analytics for selected month
-         */
         function updateAnalytics() {
             if (currentTab !== 'analytics') return;
             
@@ -1705,9 +1911,6 @@
             updateBalancesAndSettlements('analytics', monthExpenses);
         }
 
-        /**
-         * Update monthly statistics
-         */
         function updateMonthlyStats(monthExpenses) {
             const monthlyStatsDiv = document.getElementById('monthlyStats');
             const totalAmount = monthExpenses.reduce((sum, expense) => sum + expense.amount, 0);
@@ -1734,9 +1937,6 @@
             `;
         }
 
-        /**
-         * Update top spenders analysis
-         */
         function updateTopSpenders(monthExpenses) {
             const topSpendersDiv = document.getElementById('topSpenders');
             const spenderStats = {};
@@ -1762,9 +1962,6 @@
             `).join('');
         }
 
-        /**
-         * Update expense categories analysis
-         */
         function updateExpenseCategories(monthExpenses) {
             const categoriesDiv = document.getElementById('expenseCategories');
             const categories = {};
@@ -1791,9 +1988,6 @@
             `).join('');
         }
 
-        /**
-         * Simple expense categorization
-         */
         function categorizeExpense(description) {
             const desc = description.toLowerCase();
             
@@ -1814,9 +2008,6 @@
             }
         }
 
-        /**
-         * Update balances and settlements
-         */
         function updateBalancesAndSettlements(context, contextExpenses = null) {
             const expensesToUse = contextExpenses || expenses;
             const totalAmount = expensesToUse.reduce((sum, expense) => sum + expense.amount, 0);
@@ -1851,9 +2042,6 @@
             }
         }
 
-        /**
-         * Update dashboard balances
-         */
         function updateDashboardBalances(balances) {
             const balancesHtml = Object.entries(balances).map(([name, balance]) => {
                 const isPositive = balance > 0.01;
@@ -1874,36 +2062,31 @@
             document.getElementById('dashboardBalances').innerHTML = balancesHtml;
         }
 
-        /**
-         * Update dashboard settlements
-         */
         function updateDashboardSettlements(balances) {
-            const settlements = calculateSettlements(balances);
+            const currentSettlements = calculateSettlements(balances);
+            const unpaidSettlements = settlements.filter(s => !s.paid);
             
-            if (settlements.length === 0) {
+            if (currentSettlements.length === 0) {
                 document.getElementById('dashboardSettlements').innerHTML = '<p style="color: #28a745; font-weight: bold;">✅ All settled! No transactions needed.</p>';
             } else {
-                const settlementsHtml = settlements.map(settlement => `
+                const settlementsHtml = unpaidSettlements.map(settlement => `
                     <div class="balance-item">
                         <span>${settlement.from} → ${settlement.to}</span>
                         <span style="color: #4facfe; font-weight: bold;">₹${settlement.amount.toFixed(2)}</span>
                     </div>
                 `).join('');
                 
-                document.getElementById('dashboardSettlements').innerHTML = settlementsHtml;
+                document.getElementById('dashboardSettlements').innerHTML = settlementsHtml || '<p style="color: #28a745; font-weight: bold;">✅ All settlements marked as paid!</p>';
             }
         }
 
-        /**
-         * Update analytics settlements
-         */
         function updateAnalyticsSettlements(balances) {
-            const settlements = calculateSettlements(balances);
+            const currentSettlements = calculateSettlements(balances);
             
-            if (settlements.length === 0) {
+            if (currentSettlements.length === 0) {
                 document.getElementById('analyticsSettlements').innerHTML = '<p style="color: #28a745; font-weight: bold;">✅ All settled for this month!</p>';
             } else {
-                const settlementsHtml = settlements.map(settlement => `
+                const settlementsHtml = currentSettlements.map(settlement => `
                     <div class="balance-item">
                         <span>${settlement.from} → ${settlement.to}</span>
                         <span style="color: #4facfe; font-weight: bold;">₹${settlement.amount.toFixed(2)}</span>
@@ -1914,9 +2097,6 @@
             }
         }
 
-        /**
-         * Calculate optimal settlements
-         */
         function calculateSettlements(balances) {
             const creditors = [];
             const debtors = [];
@@ -1929,7 +2109,7 @@
                 }
             });
             
-            const settlements = [];
+            const settlementsResult = [];
             let creditorIndex = 0;
             let debtorIndex = 0;
             
@@ -1939,7 +2119,7 @@
                 
                 const settlementAmount = Math.min(creditor.amount, debtor.amount);
                 
-                settlements.push({
+                settlementsResult.push({
                     from: debtor.name,
                     to: creditor.name,
                     amount: settlementAmount
@@ -1957,7 +2137,7 @@
                 }
             }
             
-            return settlements;
+            return settlementsResult;
         }
 
         // Event listeners for keyboard shortcuts
@@ -1979,4 +2159,8 @@
 
     </script>
 </body>
-</html>
+</html>="margin-bottom: 0; min-width: 150px;">
+                            <label for="startDate">From Date:</label>
+                            <input type="date" id="startDate">
+                        </div>
+                        <div class="form-group" style
