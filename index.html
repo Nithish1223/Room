@@ -555,6 +555,79 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
+        
+        .calculator-display {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 25px;
+        }
+        
+        .calculator-items {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .calculator-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e1e5e9;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .calculator-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .calculator-total {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .item-details {
+            flex: 1;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .item-amount {
+            color: #4facfe;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .remove-item {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+        
+        .remove-item:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -568,6 +641,7 @@
             <button class="nav-tab active" onclick="switchTab('dashboard')">📊 Dashboard</button>
             <button class="nav-tab" onclick="switchTab('members')">👥 Members</button>
             <button class="nav-tab" onclick="switchTab('expenses')">💰 Add Expense</button>
+            <button class="nav-tab" onclick="switchTab('calculator')">🧮 Calculator</button>
             <button class="nav-tab" onclick="switchTab('history')">📋 History</button>
             <button class="nav-tab" onclick="switchTab('analytics')">📈 Analytics</button>
         </div>
@@ -649,6 +723,68 @@
             </div>
         </div>
         
+        <!-- Calculator Tab -->
+        <div id="calculator" class="tab-content">
+            <div class="section">
+                <h2>🧮 Expense Calculator</h2>
+                <p style="color: #666; margin-bottom: 25px;">Add multiple items for the same date and person, then save as one expense.</p>
+                
+                <div class="form-grid">
+                    <div>
+                        <div class="form-group">
+                            <label for="calcDate">Date:</label>
+                            <input type="date" id="calcDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="calcPaidBy">Paid By:</label>
+                            <select id="calcPaidBy">
+                                <option value="">Select who paid</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="form-group">
+                            <label for="itemDescription">Item Description:</label>
+                            <input type="text" id="itemDescription" placeholder="What item was bought?">
+                        </div>
+                        <div class="form-group">
+                            <label for="itemAmount">Item Amount (₹):</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="itemAmount" placeholder="0.00" step="0.01" min="0" style="flex: 1;">
+                                <button onclick="addItemToCalculator()" class="btn-success" style="width: auto; padding: 15px 20px;">Add Item</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Calculator Display -->
+                <div class="calculator-display">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>📝 Items List</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="clearCalculator()" class="btn-secondary" style="width: auto; padding: 10px 15px;">Clear All</button>
+                            <div class="calculator-total">
+                                Total: ₹<span id="calculatorTotal">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="calculatorItems" class="calculator-items">
+                        <div class="empty-state">
+                            <div style="font-size: 3em;">🛒</div>
+                            <p>No items added yet. Start adding items to calculate total.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 25px;">
+                        <button onclick="saveCalculatorExpense()" id="saveCalculatorBtn" class="btn-success" style="width: 100%;">
+                            💾 Save as Single Expense
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Add Expense Tab -->
         <div id="expenses" class="tab-content">
             <div class="section">
@@ -685,24 +821,32 @@
         <div id="history" class="tab-content">
             <div class="section">
                 <h2>📋 Expense History</h2>
-                <div class="date-filter">
-                    <div class="form-group">
-                        <label for="startDate">From Date:</label>
-                        <input type="date" id="startDate">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap; flex: 1;">
+                        <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
+                            <label for="startDate">From Date:</label>
+                            <input type="date" id="startDate">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
+                            <label for="endDate">To Date:</label>
+                            <input type="date" id="endDate">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0; min-width: 150px;">
+                            <label for="memberFilter">Filter by Member:</label>
+                            <select id="memberFilter">
+                                <option value="">All Members</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>&nbsp;</label>
+                            <button onclick="filterExpenses()" class="btn-success">Apply Filter</button>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="endDate">To Date:</label>
-                        <input type="date" id="endDate">
-                    </div>
-                    <div class="form-group">
-                        <label for="memberFilter">Filter by Member:</label>
-                        <select id="memberFilter">
-                            <option value="">All Members</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
+                    <div class="form-group" style="margin-bottom: 0;">
                         <label>&nbsp;</label>
-                        <button onclick="filterExpenses()" class="btn-success">Apply Filter</button>
+                        <button onclick="downloadExpensesCSV()" class="btn-secondary" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+                            📥 Download CSV
+                        </button>
                     </div>
                 </div>
                 
@@ -796,6 +940,7 @@
         let currentTab = 'dashboard';
         let selectedMonth = new Date().getMonth();
         let selectedYear = new Date().getFullYear();
+        let calculatorItems = [];
 
         // Make functions available globally
         window.switchTab = switchTab;
@@ -805,10 +950,16 @@
         window.deleteExpense = deleteExpense;
         window.filterExpenses = filterExpenses;
         window.selectMonth = selectMonth;
+        window.addItemToCalculator = addItemToCalculator;
+        window.removeItemFromCalculator = removeItemFromCalculator;
+        window.clearCalculator = clearCalculator;
+        window.saveCalculatorExpense = saveCalculatorExpense;
+        window.downloadExpensesCSV = downloadExpensesCSV;
 
         // Initialize the app
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('expenseDate').valueAsDate = new Date();
+            document.getElementById('calcDate').valueAsDate = new Date();
             document.getElementById('startDate').valueAsDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
             document.getElementById('endDate').valueAsDate = new Date();
             
@@ -998,13 +1149,21 @@
          */
         function updatePaidByOptions() {
             const paidBySelect = document.getElementById('expensePaidBy');
+            const calcPaidBySelect = document.getElementById('calcPaidBy');
+            
             paidBySelect.innerHTML = '<option value="">Select who paid</option>';
+            calcPaidBySelect.innerHTML = '<option value="">Select who paid</option>';
             
             members.forEach(member => {
-                const option = document.createElement('option');
-                option.value = member.name;
-                option.textContent = member.name;
-                paidBySelect.appendChild(option);
+                const option1 = document.createElement('option');
+                option1.value = member.name;
+                option1.textContent = member.name;
+                paidBySelect.appendChild(option1);
+                
+                const option2 = document.createElement('option');
+                option2.value = member.name;
+                option2.textContent = member.name;
+                calcPaidBySelect.appendChild(option2);
             });
         }
 
@@ -1111,6 +1270,234 @@
             
             addBtn.disabled = false;
             addBtn.textContent = 'Add Expense';
+        }
+
+        /**
+         * Add item to calculator
+         */
+        function addItemToCalculator() {
+            const itemDescription = document.getElementById('itemDescription').value.trim();
+            const itemAmount = parseFloat(document.getElementById('itemAmount').value);
+            
+            if (!itemDescription) {
+                showError('Please enter item description');
+                return;
+            }
+            
+            if (!itemAmount || itemAmount <= 0) {
+                showError('Please enter a valid amount');
+                return;
+            }
+            
+            const item = {
+                id: Date.now(),
+                description: itemDescription,
+                amount: itemAmount
+            };
+            
+            calculatorItems.push(item);
+            
+            // Clear inputs
+            document.getElementById('itemDescription').value = '';
+            document.getElementById('itemAmount').value = '';
+            
+            updateCalculatorDisplay();
+        }
+
+        /**
+         * Remove item from calculator
+         */
+        function removeItemFromCalculator(itemId) {
+            calculatorItems = calculatorItems.filter(item => item.id !== itemId);
+            updateCalculatorDisplay();
+        }
+
+        /**
+         * Clear all calculator items
+         */
+        function clearCalculator() {
+            if (calculatorItems.length === 0) return;
+            
+            if (confirm('Are you sure you want to clear all items?')) {
+                calculatorItems = [];
+                updateCalculatorDisplay();
+            }
+        }
+
+        /**
+         * Update calculator display
+         */
+        function updateCalculatorDisplay() {
+            const calculatorItemsDiv = document.getElementById('calculatorItems');
+            const calculatorTotal = document.getElementById('calculatorTotal');
+            
+            if (calculatorItems.length === 0) {
+                calculatorItemsDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div style="font-size: 3em;">🛒</div>
+                        <p>No items added yet. Start adding items to calculate total.</p>
+                    </div>
+                `;
+                calculatorTotal.textContent = '0.00';
+                return;
+            }
+            
+            const total = calculatorItems.reduce((sum, item) => sum + item.amount, 0);
+            calculatorTotal.textContent = total.toFixed(2);
+            
+            calculatorItemsDiv.innerHTML = calculatorItems.map(item => `
+                <div class="calculator-item">
+                    <div class="item-details">
+                        <div class="item-name">${item.description}</div>
+                    </div>
+                    <div class="item-amount">₹${item.amount.toFixed(2)}</div>
+                    <button class="remove-item" onclick="removeItemFromCalculator(${item.id})">×</button>
+                </div>
+            `).join('');
+        }
+
+        /**
+         * Save calculator items as single expense
+         */
+        async function saveCalculatorExpense() {
+            if (calculatorItems.length === 0) {
+                showError('Please add some items first');
+                return;
+            }
+            
+            const date = document.getElementById('calcDate').value;
+            const paidBy = document.getElementById('calcPaidBy').value;
+            
+            if (!date) {
+                showError('Please select a date');
+                return;
+            }
+            
+            if (!paidBy) {
+                showError('Please select who paid');
+                return;
+            }
+            
+            const total = calculatorItems.reduce((sum, item) => sum + item.amount, 0);
+            const description = `Multiple items: ${calculatorItems.map(item => item.description).join(', ')}`;
+            
+            const saveBtn = document.getElementById('saveCalculatorBtn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            
+            try {
+                await addDoc(collection(db, 'expenses'), {
+                    amount: total,
+                    description: description,
+                    date: date,
+                    paidBy: paidBy,
+                    items: calculatorItems, // Store individual items for reference
+                    createdAt: new Date()
+                });
+                
+                // Clear calculator
+                calculatorItems = [];
+                document.getElementById('calcDate').valueAsDate = new Date();
+                document.getElementById('calcPaidBy').value = '';
+                updateCalculatorDisplay();
+                
+                await loadExpenses();
+                
+                // Show success and switch to dashboard
+                const originalError = document.getElementById('errorContainer');
+                originalError.style.background = '#d4edda';
+                originalError.style.color = '#155724';
+                originalError.style.borderColor = '#c3e6cb';
+                originalError.textContent = 'Calculator expense saved successfully!';
+                originalError.style.display = 'block';
+                
+                setTimeout(() => {
+                    originalError.style.display = 'none';
+                    originalError.style.background = '#f8d7da';
+                    originalError.style.color = '#721c24';
+                    originalError.style.borderColor = '#f5c6cb';
+                }, 3000);
+                
+                switchTab('dashboard');
+            } catch (error) {
+                console.error('Error saving calculator expense:', error);
+                showError('Failed to save expense. Please try again.');
+            }
+            
+            saveBtn.disabled = false;
+            saveBtn.textContent = '💾 Save as Single Expense';
+        }
+
+        /**
+         * Download expenses as CSV
+         */
+        function downloadExpensesCSV() {
+            if (filteredExpenses.length === 0) {
+                showError('No expenses to download. Please add some expenses first.');
+                return;
+            }
+            
+            // Prepare CSV data
+            const csvData = [
+                ['Date', 'Description', 'Amount (₹)', 'Paid By', 'Created At']
+            ];
+            
+            filteredExpenses.forEach(expense => {
+                csvData.push([
+                    expense.date,
+                    expense.description.replace(/,/g, ';'), // Replace commas to avoid CSV issues
+                    expense.amount.toFixed(2),
+                    expense.paidBy,
+                    new Date(expense.createdAt.seconds * 1000).toLocaleDateString('en-IN')
+                ]);
+            });
+            
+            // Add summary data
+            csvData.push([]); // Empty row
+            csvData.push(['SUMMARY']);
+            csvData.push(['Total Expenses', filteredExpenses.length]);
+            csvData.push(['Total Amount', `₹${filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0).toFixed(2)}`]);
+            
+            // Add member-wise breakdown
+            csvData.push([]);
+            csvData.push(['MEMBER-WISE BREAKDOWN']);
+            const memberStats = {};
+            filteredExpenses.forEach(expense => {
+                memberStats[expense.paidBy] = (memberStats[expense.paidBy] || 0) + expense.amount;
+            });
+            
+            Object.entries(memberStats).forEach(([member, amount]) => {
+                csvData.push([member, `₹${amount.toFixed(2)}`]);
+            });
+            
+            // Convert to CSV string
+            const csvContent = csvData.map(row => row.join(',')).join('\n');
+            
+            // Create and download file
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `expenses_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success message
+            const originalError = document.getElementById('errorContainer');
+            originalError.style.background = '#d4edda';
+            originalError.style.color = '#155724';
+            originalError.style.borderColor = '#c3e6cb';
+            originalError.textContent = 'CSV file downloaded successfully!';
+            originalError.style.display = 'block';
+            
+            setTimeout(() => {
+                originalError.style.display = 'none';
+                originalError.style.background = '#f8d7da';
+                originalError.style.color = '#721c24';
+                originalError.style.borderColor = '#f5c6cb';
+            }, 3000);
         }
 
         /**
@@ -1580,6 +1967,14 @@
 
         document.getElementById('expenseDescription').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') addExpense();
+        });
+
+        document.getElementById('itemDescription').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addItemToCalculator();
+        });
+
+        document.getElementById('itemAmount').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addItemToCalculator();
         });
 
     </script>
